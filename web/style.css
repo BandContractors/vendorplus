@@ -83,7 +83,7 @@ tr {
 .clsMainFrom{
     border: 5px solid;
     width: 1100px;
-    border-color: #00B461;
+    border-color: #17415D;
 }
 .clsMainFromNew{
     border: 5px solid;
@@ -101,7 +101,7 @@ tr {
 .clsGridMainHeader{
     /* width: 1100px; */
     width: 1100px;
-    background-color: #00B461;
+    background-color: #17415D;
 }
 .clsGridMainHeaderChild{
     width: 1060px;
@@ -113,15 +113,15 @@ tr {
 }
 .clsGridMainCommands{
     width: 1100px;
-    background-color: #00B461;
+    background-color: #17415D;
 }
 .clsGridMainCommandsChild{
     width: 1060px;
-    background-color: #00B461;
+    background-color: #17415D;
 }
 .clsGridMainCommands1{
     width: 395px;
-    background-color: #00B461;
+    background-color: #17415D;
 }
 .clsGridMainCommands2{
     width: 395px;
@@ -247,7 +247,7 @@ tr {
 }
 .clsPanelReportFilter{
     width: 100%;
-    background-color: #b3f2b3;
+    background-color: #ECEFF7;
 }
 .clsPanelReportFilterTitle{
     width: 100%;

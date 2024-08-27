@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title>New Sales Invoice</title>
+        <title>Sale</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
@@ -57,12 +57,12 @@
                 <p:commandLink id="cmdbHeader1" value="#{langsys['Show']} #{langsys['Detail']}" style="color: blue;text-decoration: none;" rendered="#{!transExtBean.showDetail}">
                     <p:ajax listener="#{transExtBean.reverseShowDetail()}" process="@this" update="pnlgCaption pnlHeader"/>
                 </p:commandLink>
-                <p:commandLink id="cmdbHeader2" value="#{langsys['Hide']} #{langsys['Detail']}" style="color: blue;text-decoration: none;" rendered="#{transExtBean.showDetail}">
+                <p:commandLink id="cmdbHeader2" value="#{langsys['Hide']} #{langsys['Detail']}" style="color: red;text-decoration: none;" rendered="#{transExtBean.showDetail}">
                     <p:ajax listener="#{transExtBean.reverseShowDetail()}" process="@this" update="pnlgCaption pnlHeader"/>
                 </p:commandLink>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="VAT #{langsys['Inclusive']}:#{companySetting.EIsVatInclusive}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓':':No effect'}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ #{langsys['AR']}↑ Tax↑"/>
+                <h:outputLabel style="color: white;" value="VAT #{langsys['Inclusive']}:#{companySetting.EIsVatInclusive}"/>
+                <h:outputLabel style="color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓':':No effect'}"/>
+                <h:outputLabel style="color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ #{langsys['AR']}↑ Tax↑"/>
             </h:panelGrid>
             <h:panelGrid id="pnlDraft">
                 <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="background-color: red;" rendered="#{transBean.transsDraft.size()>0}">
@@ -125,8 +125,8 @@
                     <h:outputLabel  value="#{langsys['Currency']}"/>
                     <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-decoration: none;"/>
                     <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}"/>
-                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']}(#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
-                    <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']}(#{trans.currencyCode})"/>
+                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Outstanding"/>
+                    <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Deposit"/>
                     <h:outputLabel value=""/>
                     <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;height: 24px;"/>
                     <p:calendar styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" pattern="#{companySetting.getDateFormat()}" size="8" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>

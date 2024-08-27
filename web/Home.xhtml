@@ -6,13 +6,17 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>#{menuItemBean.menuItemObj.SYSTEM_NAME_CLIENT}</title>
+        <title>TillMANAGER POS</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
     </h:head>
     <f:event listener="#{navigationBean.checkAccessDeniedHome()}" type="preRenderView" />
     <h:body>
         <ui:include src="Menu.xhtml"/>
+        <h:panelGrid style="width: 50%;margin-top: 7rem;text-align: center;">
+            <h:graphicImage  alt="LOGO" value="resources/images/till-banner.png" />
+        </h:panelGrid>
+        
         <form>
             <h:outputLabel id="outlNavMsg" value="#{navigationBean.navMsg}" style="color: red"/>
         </form>

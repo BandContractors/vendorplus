@@ -5,14 +5,14 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>TillMANAGER POS</title>
+        <title>#{menuItemBean.menuItemObj.SYSTEM_NAME}</title>
         <style>
             .user .ui-menuitem-text{color:white;} .ui-menu .ui-menuitem .ui-state-hover{
                 color : white;
-                background: #17415D;
+                background: #FF0000;
                 -webkit-box-shadow: 0px 0px 8px #85b2cb;
                 box-shadow: 0px 0px 8px #85b2cb;
-            } .ui-menubar,.ui-menu-child,.ui-menu {background: #F0F0F0 !important;}
+            } .ui-menubar,.ui-menu-child,.ui-menu {background: yellow !important;}
         </style>
         <script  language="javascript">
             function doUpdateMenuClick() {
@@ -24,14 +24,14 @@
     </h:head>
     <h:body>
         <h:form id="frmMenu">  
-            <h:panelGrid columns="2" style="background-color: #17415D;width: 100%;color: white;height: 2rem">
-                <p:outputLabel style="float: left;" id="olblTitle"  value="TillManger POS #{menuItemBean.menuItemObj.SYSTEM_VERSION}"/>
-                <p:outputLabel style="float: right"  value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{menuItemBean.menuItemObj.CURRENT_STORE.storeName})"/>
+            <h:panelGrid columns="2" style="background-color: #00B259;width: 100%;color: white;">
+                <p:outputLabel style="float: left;" id="olblTitle"  value="#{menuItemBean.menuItemObj.SYSTEM_NAME_CLIENT} #{menuItemBean.menuItemObj.SYSTEM_VERSION}"/>
+                <p:outputLabel style="float: right"  value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{companySetting.getBranchCode()} - #{menuItemBean.menuItemObj.CURRENT_STORE.storeName})"/>
             </h:panelGrid>
             <p:remoteCommand name="remoteBtnUpdateMenu" process="@this" update="mnubMain"/>
             <p:menubar id="mnubMain">  
                 <p:menuitem value="#{langsys['Home']}" action="#{navigationBean.redirectToHome()}" icon="ui-icon-home" />
-                <p:submenu label="Pos" icon="ui-icon-plus"> 
+                <p:submenu label="#{langsys['Transaction']}" icon="ui-icon-plus"> 
                     <p:separator />
                     <p:submenu label="#{langsys['Purchase']} #{langsys['and']} #{langsys['Expense']}">  
                         <p:separator />
@@ -68,13 +68,64 @@
                     </p:submenu>
                     <p:separator />
                     <p:submenu label="#{langsys['Sales']}">
-                         <p:separator />
-                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']}" action="#{navigationBean.redirectToRetailSaleInvoice()}" />
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Quotation']}">  
                             <p:separator />
-                            <p:menuitem value="#{langsys['Wholesale']}" action="#{navigationBean.redirectToWholeSaleInvoice()}" />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToRetailSaleQuotation()}" />
                             <p:separator />
-                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']}" action="#{navigationBean.redirectToSpecialSaleInvoice()}" />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToWholeSaleQuotation()}" />
                             <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToSpecialSaleQuotation()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Order']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderRetail()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderWhole()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderSpecial()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Quick']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderQuick()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Order']} #{langsys['Dashboard']}" action="SaleOrderQuickDashboard?faces-redirect=true" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Invoice']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToRetailSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToWholeSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToSpecialSaleInvoice()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Goods']} #{langsys['Delivery']}" action="#{navigationBean.redirectToGoodsDelivery()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Package']}" action="#{navigationBean.redirectToSalesPackaging()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:submenu label="#{langsys['Hire']}" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Quotation']}" action="#{navigationBean.redirectToHireQuotation()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Invoice']}" action="#{navigationBean.redirectToHireInvoice()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Delivery']} #{langsys['Note']}" action="#{navigationBean.redirectToHireDeliveryNote()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Return']} #{langsys['Note']}" action="#{navigationBean.redirectToHireReturnNote()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Production']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Map']} #{langsys['Product']} #{langsys['and']} #{langsys['Inputs']}" action="#{navigationBean.redirectToProductionMap()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Production']}" action="#{navigationBean.redirectToProduction()}" /> 
+                        <p:separator />
                     </p:submenu>
                     <p:separator />
                     <p:submenu label="#{langsys['Manage']} #{langsys['Stock']}">  
@@ -127,6 +178,8 @@
                         <p:separator />
                     </p:submenu>
                     <p:separator />
+                    <p:menuitem value="#{langsys['Approval']}" action="#{navigationBean.redirectToTransactionApproval()}" />
+                    <p:separator />
                 </p:submenu>  
                 <p:submenu label="#{langsys['Item']}" icon="ui-icon-pencil">  
                     <p:separator />
@@ -169,7 +222,20 @@
                     <p:separator />
                     <p:menuitem value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorSupplier()}" /> 
                     <p:separator />
-
+                    <p:menuitem value="#{langsys['Scheme']} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorScheme()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Provider']} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorProvider()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Segments']}" action="#{navigationBean.redirectToTransactorSegment()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Merge']} #{langsys['Partner']}" action="#{navigationBean.redirectToTransactorMerge()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Bulk']} #{langsys['Email']}" action="#{navigationBean.redirectToEmail()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Contact']} #{langsys['List']}" action="#{navigationBean.redirectToContactList()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Subscription']}" action="#{navigationBean.redirectToSubscription()}" /> 
+                    <p:separator />
                 </p:submenu>
                 <p:submenu label="#{langsys['Accounts']}" icon="ui-icon-lightbulb">  
                     <p:separator />
@@ -469,11 +535,11 @@
                     <p:separator />
                 </p:submenu>  
                 <p:menuitem id="mniAlert" value="#{generalUserSetting.userUnreadStockAlertsCount}" action="#{navigationBean.redirectToReportAlerts()}" icon="fa fa-fw fa-envelope" style="background-color:#FF0000;color: #ffffff;float: right;" rendered="#{generalUserSetting.userUnreadStockAlertsCount>0}"/>
-                <p:submenu label="#{menuItemBean.menuItemObj.CURRENT_USER.userName}" style="background-color: #F0F0F0;color: #ffffff;float: right;" icon="ui-icon-person">  
+                <p:submenu label="#{menuItemBean.menuItemObj.CURRENT_USER.userName}" style="background-color:#FF0000;color: #ffffff;float: right;" icon="ui-icon-person">  
                     <p:separator />
                     <p:menuitem value="#{langsys['Logout']}" action="#{login.userLogout()}" icon="ui-icon-power" />
                     <p:separator />
-                    <p:menuitem value="Profile" action="#{navigationBean.redirectToMyAccount()}" icon="ui-icon-person" />
+                    <p:menuitem value="#{langsys['My']} #{langsys['Account']}" action="#{navigationBean.redirectToMyAccount()}" icon="ui-icon-pencil" />
                     <p:separator />
                 </p:submenu>
             </p:menubar>

@@ -33,79 +33,77 @@
         <f:viewAction action="#{login.refreshWarnings()}"/>
     </f:metadata>
     <h:body>
-        <h:form id="form" styleClass="clsMainFrom">  
-            <h:panelGrid id="pnlgLoginHeader" styleClass="clsGridMainHeader" columns="1" style="text-align: center;">
-                <h:outputLabel styleClass="clsLabelTop" value="#{menuItemBean.menuItemObj.SYSTEM_NAME_CLIENT} #{menuItemBean.menuItemObj.SYSTEM_VERSION}"/>
-                <h:outputLabel styleClass="clsLabelTop" style="font-size: 12px;" value="Powered by : #{menuItemBean.menuItemObj.SYSTEM_NAME}"/>
-            </h:panelGrid>
-            <h:panelGrid columns="3"  styleClass="clsGridMainHeader" style="background-color: white;text-align: center;">
-                <h:panelGrid columns="1">
-                    <h:graphicImage id="gimgLogo" alt="LOGO" value="#{companySetting.getLogoUrl()}" />
-                    <h:outputLabel style="color: red;font-weight: bold;" value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}"/>
-                    <h:outputLabel value="#{companySetting.getBranchCode()}"/>
+        <h:form id="form">  
+            <div class="card">
+                <h:panelGrid id="pnlgLoginHeader" columns="2" style="background-color: #17415D;width: 100%;color: white; height: 3rem">
+                    <h:outputLabel styleClass="clsLabelTop" value="TillManager POS #{menuItemBean.menuItemObj.SYSTEM_VERSION}"/>
+                    <h:outputLabel styleClass="clsLabelTop" style="font-size: 10px;" value="#{menuItemBean.menuItemObj.SYSTEM_NAME}"/>
                 </h:panelGrid>
-                <h:panelGrid columns="1" bgcolor="yellow" style="text-align: center;">
-                    <h:panelGrid id="pnlgInput" columns="2">
-                        <h:outputLabel value="User Name"/>
-                        <h:inputText id="itxtUserName" value="#{login.loggedInUserName}" autocomplete="off" style="width: 220px;"> 
-                            <f:ajax event="change" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
-                            <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
-                        </h:inputText>
-                        <h:outputLabel  value="Password"/>
-                        <h:inputSecret styleClass="clsInput" id="itxtPassword" value="#{login.loggedInPassword}" autocomplete="off" style="width: 220px;">
-                            <f:ajax event="change" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
-                            <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
-                        </h:inputSecret>
-                        <h:outputLabel  value=""/>
-                        <p:commandButton styleClass="clsButtonMedium" value="Confirm (ALT+C)" accesskey="c" style="width: 225px;" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                                <p:graphicImage name="/images/ajax-loader.gif"/>
-                            </p:dialog>
-                            <f:ajax listener="#{login.confirmUser()}" execute="itxtUserName itxtPassword" render="menuStore olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
-                        </p:commandButton>
-                        <h:outputLabel  value="#{companySetting.getStoreEquivName()}"/>
-                        <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{login.loggedInStoreId}" style="width: 220px;">
-                            <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{login.storesList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
-                        </h:selectOneMenu>
-                    </h:panelGrid>
-                    <h:panelGrid columns="1">
-                        <p:commandButton style="color: white;width: 350px;height:50px;font-size: 20px;background-color:#00B461;" id="cmdbLogin" value="LOGIN (ALT+L)" accesskey="l" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                                <p:graphicImage name="/images/ajax-loader.gif"/>
-                            </p:dialog>
-                            <p:ajax listener="#{login.userLogin(1)}" process="pnlgInput @this" update="pnlgLoginHeader pnlgMessage"/>
-                        </p:commandButton>
-                    </h:panelGrid>
-                </h:panelGrid>
-                <h:panelGrid>
-                    <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
-                        <p:spacer/>
-                        <p:spacer/>
-                        <p:outputLabel value="License Expiry Notice!" style="color: red;font-size: 20px;font-weight: bold;"/>
-                        <c:if test="#{0>=login.LICENSE_DAYS_LEFT}">
-                            <p:outputLabel value="Your license has expired!" style="font-weight: bold;"/>
-                        </c:if>
-                        <c:if test="#{login.LICENSE_DAYS_LEFT>0}">
-                            <p:outputLabel value="Your license is left with #{login.LICENSE_DAYS_LEFT} day(s) to expire!" style="font-weight: bold;"/>
-                        </c:if>
-                        <p:outputLabel value="Kindly contact WINGERsoft to avoid service disruption!"/>
-                    </h:panelGrid>
-                </h:panelGrid>
-            </h:panelGrid>
-            <h:panelGrid id="pnlgMessage"  style="text-align: center;width: 100%">
-                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageSuccess" style="color:green" value="#{login.actionMessageSuccess}"/>
-                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageFailure" style="color: red" value="#{login.actionMessageFailure}"/>
-                <h:outputLabel id="outlNavMsg" value="#{navigationBean.navMsg}" style="color: red"/>
-                <h:messages id="msgsMainMessage" style="color: red"/><br/>
-            </h:panelGrid> 
 
-            <h:panelGrid id="pnlgWarning"  style="text-align: left;width: 100%" columns="2" rendered="#{login.warnings.size() gt 0}">
-                <c:forEach items="#{login.warnings}" var="w">
-                    <h:outputLabel class="ui-icon ui-icon-alert"/>
-                    <h:outputLabel  style="color:#ffbf00;" value="#{w}"/>
-                </c:forEach>
-            </h:panelGrid>
+                <h:panelGrid style="width: 50%;margin-top: 7rem;text-align: center;" columns="2">
+                    <h:graphicImage  alt="LOGO" value="resources/images/till-banner.png" />
+                    <h:panelGrid columns="1"  style="margin-left: 8rem;margin-top: 2px;width: 50%;text-align: center;">
+                        <h:panelGrid columns="1" style="text-align: center;width: 100%">
+                            <h:graphicImage id="gimgLogo" alt="LOGO" value="#{companySetting.getLogoUrl()}" />
+                            <h:outputLabel style="color: red;font-weight: bold;" value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}"/>
+                            <h:outputLabel value="#{companySetting.getBranchCode()}"/>
+                        </h:panelGrid>
+                        <br/>
+                        <h:panelGrid id="pnlgInput" >
+                            <p:outputLabel value="User Name"/>
+                            <p:inputText id="itxtUserName" value="#{login.loggedInUserName}" autocomplete="off" style="width: 220px;"> 
+                                <f:ajax event="change" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                                <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                            </p:inputText>
+                            <p:outputLabel  value="Password"/>
+                            <p:password id="itxtPassword" value="#{login.loggedInPassword}" autocomplete="off" style="width: 220px;">
+                                <f:ajax event="change" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                                <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                            </p:password>
+                            <p:outputLabel  value=""/>
+                            <p:commandButton styleClass="clsButtonMedium" value="Verify" accesskey="c" style="width: 225px;color: white;background-color: red; border-radius: 20px" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                                <f:ajax listener="#{login.confirmUser()}" execute="itxtUserName itxtPassword" render="menuStore olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
+                            </p:commandButton>
+                            <br/>
+                            <p:outputLabel  value="#{companySetting.getStoreEquivName()}"/>
+                            <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{login.loggedInStoreId}" style="width: 220px;">
+                                <f:selectItem itemLabel="" itemValue="0"/>
+                                <f:selectItems value="#{login.storesList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <p:commandButton styleClass="clsButtonMedium" style="color: white;width: 225px;background-color: #17415D; border-radius: 20px" id="cmdbLogin" value="LOGIN" accesskey="l" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                                <p:ajax listener="#{login.userLogin(1)}" process="pnlgInput @this" update="pnlgLoginHeader pnlgMessage"/>
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid>
+                        <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
+                            <p:spacer/>
+                            <p:spacer/>
+                            <p:outputLabel value="License Expiry Notice!" style="color: red;font-size: 20px;font-weight: bold;"/>
+                            <c:if test="#{0>=login.LICENSE_DAYS_LEFT}">
+                                <p:outputLabel value="License expired!" style="font-weight: bold;"/>
+                            </c:if>
+                            <c:if test="#{login.LICENSE_DAYS_LEFT>0}">
+                                <p:outputLabel value="#{login.LICENSE_DAYS_LEFT} day(s) to lincence expiry!" style="font-weight: bold;"/>
+                            </c:if>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgMessage"  style="text-align: center;width: 100%">
+                    <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageSuccess" style="color:green" value="#{login.actionMessageSuccess}"/>
+                    <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageFailure" style="color: red" value="#{login.actionMessageFailure}"/>
+                    <h:outputLabel id="outlNavMsg" value="#{navigationBean.navMsg}" style="color: red"/>
+                    <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                </h:panelGrid> 
+            </div>
         </h:form>
     </h:body>
 </html>
