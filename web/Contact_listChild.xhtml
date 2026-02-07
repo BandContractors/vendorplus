@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Contact</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -89,7 +89,7 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" style="color: white; background-color: #00B259" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" style="color: white; background-color: #7BC043" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
@@ -151,7 +151,7 @@
                     <!-- column header -->
                     <f:facet name="header">Action</f:facet>
                     <!-- row record -->
-                    <p:commandButton value="Edit" style="color: white; background-color: #00B259">
+                    <p:commandButton value="Edit" style="color: white; background-color: #7BC043">
                         <f:ajax listener="#{contact_listBean.displayContact_list(t,contact_listBean.contact_listObj)}" execute="@form" render="@form"/>
                     </p:commandButton>
                     &nbsp;

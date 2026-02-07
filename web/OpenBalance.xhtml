@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Open Balance</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -38,9 +38,9 @@
                     <f:selectItem itemValue="#{generalUserSetting.getCurrentTransactionReasonId()}" itemLabel="#{transactionReasonBean.getTransactionReason(generalUserSetting.getCurrentTransactionReasonId()).transactionReasonName}"/>
                     <f:ajax execute="@this"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Record']} #{langsys['Opening']} #{langsys['Balance']}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Accounts']}↑↓"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Record']} #{langsys['Opening']} #{langsys['Balance']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['Accounts']}↑↓"/>
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgInput" styleClass="clsGridMainInput">

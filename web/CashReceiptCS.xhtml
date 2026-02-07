@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Cash Receipt CS</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -45,8 +45,8 @@
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="3">
                 <h:outputLabel styleClass="clsLabelTop" id="olblPaymentHeader" value="#{langsys['Cash']} #{langsys['Receipt']} #{langsys['from']} #{langsys['Credit']} #{langsys['Sale']}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Receipt']} #{langsys['against']} #{langsys['Sales']} #{langsys['Transaction']}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ AR↓"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Receipt']} #{langsys['against']} #{langsys['Sales']} #{langsys['Transaction']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ AR↓"/>
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlSearch" styleClass="clsGridMainInput" columns="2" style="background-color: #b3f2b3;width: 100%;">

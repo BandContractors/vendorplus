@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>View Purchase Invoice</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -33,11 +33,11 @@
                         return false;"> 
                 <p:panel id="pnlTransaction">
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionOutputLabel)} - #{langsys['Goods']} #{langsys['and']} #{langsys['Services']} (#{langsys['For']} #{langsys['Sale']}) : #{transBean.transObj.transactionNumber}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 1 ? '↑':'No effect. '}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↓ AP↑ INV↑"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionOutputLabel)} - #{langsys['Goods']} #{langsys['and']} #{langsys['Services']} (#{langsys['For']} #{langsys['Sale']}) : #{transBean.transObj.transactionNumber}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 1 ? '↑':'No effect. '}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↓ AP↑ INV↑"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="#{langsys['From']}:"/>

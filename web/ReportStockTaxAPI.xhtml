@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Stock Tax</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -174,7 +174,7 @@
                         <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Add']}" style="text-align: right;background-color: #00B461;color: white;font-size: 13px;width: 5%;">
+                <p:column headerText="#{langsys['Add']}" style="text-align: right;background-color: #7BC043;color: white;font-size: 13px;width: 5%;">
                     <h:outputText value="#{itm.qty_added}" rendered="#{itm.qty_added>0}">
                         <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>

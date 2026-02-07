@@ -10,7 +10,7 @@
 
     <h:head>
         <title>Login</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="favicon.ico" rel="shortcut icon" type="image/png" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  type="text/javascript">
             function confirmDelete()
@@ -32,17 +32,16 @@
         <f:viewAction action="#{login.refreshLicenseDaysLeft()}"/>
         <f:viewAction action="#{login.refreshWarnings()}"/>
     </f:metadata>
-    <h:body>
+    <h:body style="background-color: white;">
         <h:form id="form">  
             <div class="card">
-                <h:panelGrid id="pnlgLoginHeader" columns="2" style="background-color: #17415D;width: 100%;color: white; height: 3rem">
-                    <h:outputLabel styleClass="clsLabelTop" value="TillManager POS #{menuItemBean.menuItemObj.SYSTEM_VERSION}"/>
-                    <h:outputLabel styleClass="clsLabelTop" style="font-size: 10px;" value="#{menuItemBean.menuItemObj.SYSTEM_NAME}"/>
+                <h:panelGrid id="pnlgLoginHeader" columns="1" style="background-color: #7BC043;width: 100%;color: white; height: 3rem;text-align: center;">
+                    <h:outputLabel styleClass="clsLabelTop" value="VENDORPLUS" style="font-size: 24px;"/>
                 </h:panelGrid>
 
-                <h:panelGrid style="width: 50%;margin-top: 7rem;text-align: center;" columns="2">
-                    <h:graphicImage  alt="LOGO" value="resources/images/till-banner.png" />
-                    <h:panelGrid columns="1"  style="margin-left: 8rem;margin-top: 2px;width: 50%;text-align: center;">
+                <h:panelGrid style="width: 100%;margin-top: 5rem;text-align: center;" columns="2">
+                    <h:graphicImage  alt="LOGO" value="resources/images/vendorplus.jpeg" style="max-width: 500px;"/>
+                    <h:panelGrid columns="1"  style="margin-left: 2rem;margin-top: 2px;text-align: center;">
                         <h:panelGrid columns="1" style="text-align: center;width: 100%">
                             <h:graphicImage id="gimgLogo" alt="LOGO" value="#{companySetting.getLogoUrl()}" />
                             <h:outputLabel style="color: red;font-weight: bold;" value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}"/>
@@ -61,7 +60,7 @@
                                 <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
                             </p:password>
                             <p:outputLabel  value=""/>
-                            <p:commandButton styleClass="clsButtonMedium" value="Verify" accesskey="c" style="width: 225px;color: white;background-color: red; border-radius: 20px" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton styleClass="clsButtonMedium" value="Verify" accesskey="c" style="width: 225px;color: white;background-color: #7BC043; border-radius: 20px" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>
@@ -75,7 +74,7 @@
                             </h:selectOneMenu>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
-                            <p:commandButton styleClass="clsButtonMedium" style="color: white;width: 225px;background-color: #17415D; border-radius: 20px" id="cmdbLogin" value="LOGIN" accesskey="l" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton styleClass="clsButtonMedium" style="color: white;width: 225px;background-color: #7BC043; border-radius: 20px" id="cmdbLogin" value="LOGIN" accesskey="l" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>

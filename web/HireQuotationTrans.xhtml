@@ -8,7 +8,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Hire Quotation</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -45,9 +45,9 @@
                 <h:selectOneMenu  value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Prices are VAT Inclusive:#{companySetting.EIsVatInclusive}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Inventory:No effect"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Prices are VAT Inclusive:#{companySetting.EIsVatInclusive}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Inventory:No effect"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Ledger:No effect"/>
             </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="7" style="background-color: #E5E5E5;width: 100%;">
                 <h:outputLabel  value="From"/>

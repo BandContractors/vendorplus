@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Delivery Note-Hire</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -40,9 +40,9 @@
                 <h:selectOneMenu  value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{95}" itemLabel="#{transactionReasonBean.getTransactionReason(95).transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value=""/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Inventory:No effect"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value=""/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Inventory:No effect"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Ledger:No effect"/>
             </h:panelGrid>
             <h:panelGrid id="pnlSearch" columns="6" style="background-color: #b3f2b3;width: 100%;">
                 <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>

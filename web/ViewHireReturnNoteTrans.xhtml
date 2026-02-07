@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>View Return Note-Hire</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -27,11 +27,11 @@
         <h:form id="TransactionFormSales" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">  
             <h:panelGrid styleClass="clsGridMainHeader" columns="4">
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionReasonBean.getTransactionReason(96).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Inventory']}↑"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['If']} #{langsys['Applicable']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{transactionReasonBean.getTransactionReason(96).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Inventory']}↑"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['If']} #{langsys['Applicable']}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlHeader" columns="7" style="background-color: #E5E5E5;width: 100%;">
                 <h:outputLabel value="#{langsys['To']}"/>

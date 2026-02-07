@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Depreciation Schedule</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -33,7 +33,7 @@
                 <p:growl id="growl2"/>
                 <p:panel id="pnlCAT">
                     <h:panelGrid columns="1">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Depreciation']} #{langsys['schedule']} #{langsys['for']} #{accDepScheduleBean.itemDescription}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Depreciation']} #{langsys['schedule']} #{langsys['for']} #{accDepScheduleBean.itemDescription}"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblDS" value="#{accDepScheduleBean.accDepScheduleList}" var="ds" 
                                  styleClass="cls-table" tableStyle="width:auto;" >

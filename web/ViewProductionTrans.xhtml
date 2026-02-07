@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>View Production</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -32,11 +32,11 @@
                         return false;"> 
                 <p:panel id="pnlTransaction">
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transProductionBean.actionType.equals('View')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transProductionBean.actionType.equals('Edit')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionOutputLabel)} : #{transProductionBean.transProdObj.transaction_number}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}(#{langsys['Product']}↑↓ #{langsys['Raw Material']}↑↓)"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['VIEW']}" rendered="#{transProductionBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['EDIT']}" rendered="#{transProductionBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionOutputLabel)} : #{transProductionBean.transProdObj.transaction_number}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}(#{langsys['Product']}↑↓ #{langsys['Raw Material']}↑↓)"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="4">
                         <h:outputLabel  value="#{langsys['From']}:"/>

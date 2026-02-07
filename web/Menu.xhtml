@@ -5,11 +5,11 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>TillMANAGER POS</title>
+        <title>VENDORPLUS</title>
         <style>
             .user .ui-menuitem-text{color:white;} .ui-menu .ui-menuitem .ui-state-hover{
                 color : white;
-                background: #17415D;
+                background: #7BC043;
                 -webkit-box-shadow: 0px 0px 8px #85b2cb;
                 box-shadow: 0px 0px 8px #85b2cb;
             } .ui-menubar,.ui-menu-child,.ui-menu {background: #F0F0F0 !important;}
@@ -22,12 +22,13 @@
         <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
         <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_OUT}" var="langout" />
     </h:head>
-    <h:body>
+    <h:body style="background-color: white;">
         <h:form id="frmMenu">  
-            <h:panelGrid columns="2" style="background-color: #17415D;width: 100%;color: white;height: 2rem">
-                <p:outputLabel style="float: left;" id="olblTitle"  value="TillManger POS #{menuItemBean.menuItemObj.SYSTEM_VERSION}"/>
-                <p:outputLabel style="float: right"  value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{menuItemBean.menuItemObj.CURRENT_STORE.storeName})"/>
-            </h:panelGrid>
+            <div style="background-color: #7BC043;width: 100%;color: white;padding: 15px 0;text-align: center;">
+                <p:outputLabel id="olblTitle" value="VENDORPLUS" style="font-size: 28px;font-weight: bold;"/>
+                <br/>
+                <p:outputLabel value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{menuItemBean.menuItemObj.CURRENT_STORE.storeName})" style="font-size: 12px;"/>
+            </div>
             <p:remoteCommand name="remoteBtnUpdateMenu" process="@this" update="mnubMain"/>
             <p:menubar id="mnubMain">  
                 <p:menuitem value="#{langsys['Home']}" action="#{navigationBean.redirectToHome()}" icon="ui-icon-home" />
@@ -68,13 +69,64 @@
                     </p:submenu>
                     <p:separator />
                     <p:submenu label="#{langsys['Sales']}">
-                         <p:separator />
-                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']}" action="#{navigationBean.redirectToRetailSaleInvoice()}" />
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Quotation']}">  
                             <p:separator />
-                            <p:menuitem value="#{langsys['Wholesale']}" action="#{navigationBean.redirectToWholeSaleInvoice()}" />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToRetailSaleQuotation()}" />
                             <p:separator />
-                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']}" action="#{navigationBean.redirectToSpecialSaleInvoice()}" />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToWholeSaleQuotation()}" />
                             <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToSpecialSaleQuotation()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Order']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderRetail()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderWhole()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderSpecial()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Quick']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderQuick()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Order']} #{langsys['Dashboard']}" action="SaleOrderQuickDashboard?faces-redirect=true" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Invoice']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToRetailSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToWholeSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToSpecialSaleInvoice()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Goods']} #{langsys['Delivery']}" action="#{navigationBean.redirectToGoodsDelivery()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Package']}" action="#{navigationBean.redirectToSalesPackaging()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:submenu label="#{langsys['Hire']}" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Quotation']}" action="#{navigationBean.redirectToHireQuotation()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Invoice']}" action="#{navigationBean.redirectToHireInvoice()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Delivery']} #{langsys['Note']}" action="#{navigationBean.redirectToHireDeliveryNote()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Return']} #{langsys['Note']}" action="#{navigationBean.redirectToHireReturnNote()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Production']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Map']} #{langsys['Product']} #{langsys['and']} #{langsys['Inputs']}" action="#{navigationBean.redirectToProductionMap()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Production']}" action="#{navigationBean.redirectToProduction()}" /> 
+                        <p:separator />
                     </p:submenu>
                     <p:separator />
                     <p:submenu label="#{langsys['Manage']} #{langsys['Stock']}">  
@@ -169,7 +221,12 @@
                     <p:separator />
                     <p:menuitem value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorSupplier()}" /> 
                     <p:separator />
-
+                    <p:menuitem value="#{langsys['Provider']} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorProvider()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Segments']}" action="#{navigationBean.redirectToTransactorSegment()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Merge']} #{langsys['Partner']}" action="#{navigationBean.redirectToTransactorMerge()}" /> 
+                    <p:separator />
                 </p:submenu>
                 <p:submenu label="#{langsys['Accounts']}" icon="ui-icon-lightbulb">  
                     <p:separator />
@@ -192,15 +249,7 @@
                         <p:separator />
                         <p:menuitem value="#{langsys['Other']} #{langsys['Account']} #{langsys['Balance']}" action="#{navigationBean.redirectToOpenBalanceOtherAcc()}" /> 
                         <p:separator />
-                    </p:submenu> 
-                    <p:separator />
-                    <p:submenu label="#{langsys['Human']} #{langsys['Resource']}">   
-                        <p:separator />
-                        <p:menuitem value="#{langsys['Employee']} #{langsys['Details']}" action="#" /> 
-                        <p:separator />
-                        <p:menuitem value="#{langsys['Time']} #{langsys['Sheet']}" action="Timesheet?faces-redirect=true" /> 
-                        <p:separator />
-                    </p:submenu> 
+                    </p:submenu>  
                     <p:separator />
                     <p:menuitem value="#{langsys['Record']} #{langsys['Journal']} #{langsys['Entry']}" action="#{navigationBean.redirectToJournalEntryTrans()}" /> 
                     <p:separator />

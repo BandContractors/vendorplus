@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>View Hire Return Invoice</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -25,11 +25,11 @@
                     return false;"> 
             <p:panel id="pnlMain">
                 <h:panelGrid styleClass="clsGridMainHeaderChild" columns="4">
-                    <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{transBean.actionType.equals('View')}"/>
-                    <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
-                    <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionReasonBean.getTransactionReason(97).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
-                    <h:outputLabel style="background-color:#00B461;color: white;" value="Inventory:No effect"/>
-                    <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↑ Sales↑ AR↑ Tax↑"/>
+                    <h:outputLabel style="background-color:#7BC043;color: white;" value="VIEW" rendered="#{transBean.actionType.equals('View')}"/>
+                    <h:outputLabel style="background-color:#7BC043;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
+                    <h:outputLabel style="background-color:#7BC043;color: white;" value="#{transactionReasonBean.getTransactionReason(97).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
+                    <h:outputLabel style="background-color:#7BC043;color: white;" value="Inventory:No effect"/>
+                    <h:outputLabel style="background-color:#7BC043;color: white;" value="Ledger:Cash↑ Sales↑ AR↑ Tax↑"/>
                 </h:panelGrid>
                 <h:panelGrid id="pnlHeaderChild" styleClass="clsGridMainInput" columns="5" style="background-color: #E5E5E5;width: 100%;">
                     <h:outputLabel value="From"/>

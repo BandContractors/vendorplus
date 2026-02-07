@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Item Transfer Request</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -35,8 +35,8 @@
                     return false;">
             <h:panelGrid styleClass="clsGridMainHeader" columns="3">
                 <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="#{langsys['ITEM']} #{langsys['TRANSFER']} #{langsys['REQUEST']}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No']} #{langsys['effect']}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{langsys['No']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pnlgHeader" styleClass="clsGridMainInput" columns="5">

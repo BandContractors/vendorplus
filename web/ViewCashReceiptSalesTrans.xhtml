@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>View Cash Receipt Sales</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -37,11 +37,11 @@
                         return false;"> 
                 <p:panel id="pnlTransaction">
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{payBean.actionType.equals('View')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['CANCEL']}" rendered="#{payBean.actionType.equals('Cancel')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Sales']} #{langsys['Cash']} #{langsys['Receipt']} #{langsys['No.']} : #{payBean.payObj.pay_number}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ AR↓"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['VIEW']}" rendered="#{payBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['CANCEL']}" rendered="#{payBean.actionType.equals('Cancel')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Sales']} #{langsys['Cash']} #{langsys['Receipt']} #{langsys['No.']} : #{payBean.payObj.pay_number}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ AR↓"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel value="#{langsys['Amount']} #{langsys['Received']}:"/>

@@ -8,7 +8,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Sales Order</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
     </h:head>
     <h:body>
@@ -46,8 +46,8 @@
                             <h:outputLabel id="IolblSalesInvoiceEmail" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
                         </h:panelGrid>
 
-                        <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: black;text-align: center;-webkit-print-color-adjust: exact;">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}</h:outputLabel>
+                        <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: white;text-align: center;-webkit-print-color-adjust: exact;">
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#000000;font-weight: bold;text-decoration: none;">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}</h:outputLabel>
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader4" style="width: 290px; margin: 0px;" columns="2">

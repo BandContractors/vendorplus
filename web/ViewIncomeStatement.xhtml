@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Category</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -32,7 +32,7 @@
                         return false;"> 
                 <p:panel id="pnlCAT">
                     <h:panelGrid columns="1">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{accLedgerBean.categoryHeader} (#{accLedgerBean.i} #{langsys['out']} #{langsys['of']} #{accLedgerBean.n} #{langsys['records']} #{langsys['Returned']})"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{accLedgerBean.categoryHeader} (#{accLedgerBean.i} #{langsys['out']} #{langsys['of']} #{accLedgerBean.n} #{langsys['records']} #{langsys['Returned']})"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblCAT" value="#{accLedgerBean.journalList}" var="j" 
                                  styleClass="cls-table" tableStyle="width:auto;" 

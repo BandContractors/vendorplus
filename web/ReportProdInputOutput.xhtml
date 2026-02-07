@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Input Output Detail</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -159,7 +159,7 @@
                                     #{t.transactor_names}
                                 </td>
                                 <td>
-                                    <h:outputText value="#{t.outputQty}" style="color: #00B461;">
+                                    <h:outputText value="#{t.outputQty}" style="color: #7BC043;">
                                         <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                     #{t.outputItemUnit}

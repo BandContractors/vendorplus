@@ -8,7 +8,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Hire Invoice</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -46,9 +46,9 @@
                 <h:selectOneMenu  value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{94}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Prices are VAT Inclusive:#{companySetting.EIsVatInclusive}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Inventory↓"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↑ Sales↑ AR↑ Tax↑"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Prices are VAT Inclusive:#{companySetting.EIsVatInclusive}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Inventory↓"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="Ledger:Cash↑ Sales↑ AR↑ Tax↑"/>
             </h:panelGrid>
             <h:panelGrid id="pnlDraft" styleClass="clsGridMainHeader" columns="4" style="background-color: red;" rendered="#{transBean.transsDraft.size()>0}">
                 <h:outputLabel  value="Select Draft Hire:"/>

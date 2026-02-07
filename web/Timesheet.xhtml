@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Time Sheet</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -55,7 +55,7 @@
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{staffBean.getStaffAll()}" var="s" itemLabel="#{s.first_name} #{s.second_name} #{s.third_name}" itemValue="#{s.staff_id}"/>
                     </p:selectOneMenu>
-                    <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 120px">
+                    <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #7BC043; width: 120px">
                         <p:ajax listener="#{timesheetBean.getFilteredTimesheets()}" process="@form" update="@form"/>
                     </p:commandButton>
                     <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 120px" >
@@ -245,7 +245,7 @@
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:modalTimesheet" actionListener="#{timesheetBean.displayTimesheet(ts, timesheet)}" 
-                                     oncomplete="PF('dlgTimesheet').show();" icon="ui-icon-pencil" title="#{langsys['Edit']}" style="color: white; background-color: #00B259" >
+                                     oncomplete="PF('dlgTimesheet').show();" icon="ui-icon-pencil" title="#{langsys['Edit']}" style="color: white; background-color: #7BC043" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:modalTimesheetLog" actionListener="#{timesheetBean.getTimesheetLogByTimesheetId(ts.timesheet_id)}"
@@ -319,9 +319,9 @@
                         </p:calendar>
                     </h:panelGrid>
 
-                    <h:panelGrid style="background-color: #00B461" width="100%" columns="1">
+                    <h:panelGrid style="background-color: #7BC043" width="100%" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblTimesheet form:growl1" actionListener="#{timesheetBean.saveTimesheet(timesheet)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblTimesheet form:growl1" actionListener="#{timesheetBean.saveTimesheet(timesheet)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" style="color: white; background-color: #7BC043" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>

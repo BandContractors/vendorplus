@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Cash Balancing Daily</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -71,17 +71,17 @@
                             <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{langsys['Transfer']} +" style="text-align: right;font-size: 13px;color: #00B461;">
+                    <p:column headerText="#{langsys['Transfer']} +" style="text-align: right;font-size: 13px;color: #7BC043;">
                         <h:outputText value="#{itmNew.cash_transfer_in}">
                             <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{langsys['Adjust']} +" style="text-align: right;font-size: 13px;color: #00B461;">
+                    <p:column headerText="#{langsys['Adjust']} +" style="text-align: right;font-size: 13px;color: #7BC043;">
                         <h:outputText value="#{itmNew.cash_adjustment_pos}">
                             <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{langsys['Cash']} #{langsys['Received']}" style="text-align: right;font-size: 13px;color: #00B461;">
+                    <p:column headerText="#{langsys['Cash']} #{langsys['Received']}" style="text-align: right;font-size: 13px;color: #7BC043;">
                         <h:outputText value="#{itmNew.cash_receipts}">
                             <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>

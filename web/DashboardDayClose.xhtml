@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Day Closing</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -83,7 +83,7 @@
                     <div class="col">
                         <h:panelGrid id="pnlSales" style="-webkit-print-color-adjust: exact;">
                             <table cellspacing="0" cellpadding="2" border="0" style="background-color: #b3f2b3;width: 100%;">
-                                <tr style="background-color: #00B461;">
+                                <tr style="background-color: #7BC043;">
                                     <td colspan="3" align="center" valign="bottom">
                                         <b>#{langsys['SALES']}</b>
                                     </td>
@@ -98,7 +98,7 @@
                                         #{accCurrencyBean.localCurrency.currencyCode}
                                     </td>
                                 </tr>
-                                <tr style="background-color: #00B461;">
+                                <tr style="background-color: #7BC043;">
                                     <td colspan="3" align="center" valign="bottom">
                                         <b>#{langsys['Cash']} #{langsys['Sales']}</b>
                                     </td>
@@ -113,7 +113,7 @@
                                         </td>
                                     </tr>
                                 </ui:repeat>
-                                <tr style="background-color: #00B461;">
+                                <tr style="background-color: #7BC043;">
                                     <td colspan="3" align="center" valign="bottom">
                                         <b>#{langsys['Credit']} #{langsys['Sales']}</b>
                                     </td>
@@ -128,7 +128,7 @@
                                         </td>
                                     </tr>
                                 </ui:repeat>
-                                <tr style="background-color: #00B461;">
+                                <tr style="background-color: #7BC043;">
                                     <td colspan="3" align="center" valign="bottom">
                                         <b>#{companySetting.getStoreEquivName()} #{langsys['Sales']}</b>
                                     </td>
@@ -152,7 +152,7 @@
                     <div class="col">
                         <h:panelGrid id="pnlCashReceipt" style="-webkit-print-color-adjust: exact;">
                             <table cellspacing="0" cellpadding="2" border="0" style="background-color: #b3f2b3;width: 100%;">
-                                <tr style="background-color: #00B461;">
+                                <tr style="background-color: #7BC043;">
                                     <td colspan="3" align="center" valign="bottom">
                                         <b>#{langsys['CASH']} #{langsys['RECEIVED']}</b>
                                     </td>
@@ -167,7 +167,7 @@
                                         #{accCurrencyBean.localCurrency.currencyCode}
                                     </td>
                                 </tr>
-                                <tr style="background-color: #00B461;">
+                                <tr style="background-color: #7BC043;">
                                     <td colspan="3" align="center" valign="bottom">
                                         <b>#{langsys['Cash']} #{langsys['Receipt']} #{langsys['Type']}</b>
                                     </td>
@@ -185,7 +185,7 @@
                                         </td>
                                     </tr>
                                 </ui:repeat>
-                                <tr style="background-color: #00B461;">
+                                <tr style="background-color: #7BC043;">
                                     <td colspan="3" align="center" valign="bottom">
                                         <b>#{langsys['Cash']} #{langsys['Receipt']} #{langsys['Account']}</b>
                                     </td>

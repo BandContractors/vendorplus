@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>View Sales Invoice</title>
-        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
             function confirmDelete()
@@ -37,9 +37,9 @@
                         <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
                         <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['CREDIT']} #{langsys['NOTE']}" rendered="#{transBean.actionType.equals('Cr')}"/>
                         <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['DEBIT']} #{langsys['NOTE']}" rendered="#{transBean.actionType.equals('Dr')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionReasonBean.getTransactionReason(transBean.transObj.transactionReasonId).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓↑':':No effect'}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ AR↑ #{langsys['Tax']}↑"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{transactionReasonBean.getTransactionReason(transBean.transObj.transactionReasonId).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓↑':':No effect'}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ AR↑ #{langsys['Tax']}↑"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6" rendered="#{transBean.actionType ne 'None'}">
                         <h:outputLabel  value="#{companySetting.getStoreEquivName()}"/>
