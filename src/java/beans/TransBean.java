@@ -11629,29 +11629,56 @@ public class TransBean implements Serializable {
         String the_file = "Output_0";
         int OutTransTypeId = 0;
         int OutPayTypeId = 0;
+        System.out.println("DEBUG getPrintFileName(3 params): aLevel=" + aLevel + ", aTransactionType=" + (aTransactionType == null ? "NULL" : aTransactionType.getTransactionTypeId()) + ", aPrintFileNo=" + aPrintFileNo);
         try {
             switch (aLevel) {
                 case "PARENT":
+                    TransactionType savedTransType = null;
                     try {
-                        OutTransTypeId = new GeneralUserSetting().getOutputDetailParent().getTrans().getTransactionTypeId();
-                    } catch (NullPointerException npe) {
-                    }
-                    try {
-                        OutPayTypeId = new GeneralUserSetting().getOutputDetailParent().getPay().getPayTypeId();
-                    } catch (NullPointerException npe) {
-                    }
-                    if ((OutTransTypeId == aTransactionType.getTransactionTypeId()) || (OutPayTypeId == aTransactionType.getTransactionTypeId())) {
-                        if (aPrintFileNo == 1) {
-                            the_file = aTransactionType.getPrint_file_name1();
-                        } else if (aPrintFileNo == 2) {
-                            the_file = aTransactionType.getPrint_file_name2();
+                        System.out.println("DEBUG getPrintFileName: Checking OUTPUT_DETAIL_PARENT");
+                        OutputDetail outputDetail = new GeneralUserSetting().getOutputDetailParent();
+                        System.out.println("DEBUG getPrintFileName: outputDetail = " + (outputDetail == null ? "NULL" : "NOT NULL"));
+                        if (outputDetail != null && outputDetail.getTrans() != null) {
+                            OutTransTypeId = outputDetail.getTrans().getTransactionTypeId();
+                            System.out.println("DEBUG getPrintFileName: OutTransTypeId from session = " + OutTransTypeId);
+                            // Get the actual transaction type object from the saved transaction
+                            savedTransType = new TransactionTypeBean().getTransactionType(OutTransTypeId);
+                            System.out.println("DEBUG getPrintFileName: Retrieved savedTransType for ID " + OutTransTypeId);
                         } else {
-                            if (aTransactionType.getDefault_print_file() == 1) {
-                                the_file = aTransactionType.getPrint_file_name1();
-                            } else if (aTransactionType.getDefault_print_file() == 2) {
-                                the_file = aTransactionType.getPrint_file_name2();
+                            System.out.println("DEBUG getPrintFileName: outputDetail or trans is NULL");
+                        }
+                    } catch (NullPointerException npe) {
+                        System.out.println("DEBUG getPrintFileName: NullPointerException getting OutTransTypeId: " + npe.getMessage());
+                    }
+                    try {
+                        OutputDetail outputDetail = new GeneralUserSetting().getOutputDetailParent();
+                        if (outputDetail != null && outputDetail.getPay() != null) {
+                            OutPayTypeId = outputDetail.getPay().getPayTypeId();
+                            System.out.println("DEBUG getPrintFileName: OutPayTypeId from session = " + OutPayTypeId);
+                        }
+                    } catch (NullPointerException npe) {
+                    }
+                    
+                    // If we have a saved transaction, use its transaction type for the template
+                    if (savedTransType != null) {
+                        System.out.println("DEBUG getPrintFileName: Using savedTransType from OUTPUT_DETAIL_PARENT");
+                        if (aPrintFileNo == 1) {
+                            the_file = savedTransType.getPrint_file_name1();
+                            System.out.println("DEBUG getPrintFileName: Using print_file_name1 = " + the_file);
+                        } else if (aPrintFileNo == 2) {
+                            the_file = savedTransType.getPrint_file_name2();
+                            System.out.println("DEBUG getPrintFileName: Using print_file_name2 = " + the_file);
+                        } else {
+                            if (savedTransType.getDefault_print_file() == 1) {
+                                the_file = savedTransType.getPrint_file_name1();
+                                System.out.println("DEBUG getPrintFileName: Using default print_file_name1 = " + the_file);
+                            } else if (savedTransType.getDefault_print_file() == 2) {
+                                the_file = savedTransType.getPrint_file_name2();
+                                System.out.println("DEBUG getPrintFileName: Using default print_file_name2 = " + the_file);
                             }
                         }
+                    } else {
+                        System.out.println("DEBUG getPrintFileName: No saved transaction - will return default Output_0.xhtml");
                     }
                     break;
                 case "CHILD":
@@ -11681,6 +11708,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+        System.out.println("DEBUG getPrintFileName(3 params): FINAL - Returning file = " + the_file + ".xhtml");
         return the_file + ".xhtml";
     }
 

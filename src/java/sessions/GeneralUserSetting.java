@@ -643,9 +643,15 @@ public class GeneralUserSetting implements Serializable {
         try {
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(false);
-            return (OutputDetail) httpSession.getAttribute("OUTPUT_DETAIL_PARENT");
+            HttpSession httpSession = request.getSession(true);  // Changed from false to true to ensure session exists
+            Object sessionObj = httpSession.getAttribute("OUTPUT_DETAIL_PARENT");
+            if (sessionObj == null) {
+                System.out.println("DEBUG: OUTPUT_DETAIL_PARENT is NULL in session");
+                return null;
+            }
+            return (OutputDetail) sessionObj;
         } catch (NullPointerException | ClassCastException npe) {
+            System.out.println("DEBUG: Exception getting OUTPUT_DETAIL_PARENT: " + npe.getMessage());
             return null;
         }
     }
@@ -654,9 +660,15 @@ public class GeneralUserSetting implements Serializable {
         try {
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(false);
-            return (OutputDetail) httpSession.getAttribute("OUTPUT_DETAIL_CHILD");
+            HttpSession httpSession = request.getSession(true);  // Changed from false to true to ensure session exists
+            Object sessionObj = httpSession.getAttribute("OUTPUT_DETAIL_CHILD");
+            if (sessionObj == null) {
+                System.out.println("DEBUG: OUTPUT_DETAIL_CHILD is NULL in session");
+                return null;
+            }
+            return (OutputDetail) sessionObj;
         } catch (NullPointerException | ClassCastException npe) {
+            System.out.println("DEBUG: Exception getting OUTPUT_DETAIL_CHILD: " + npe.getMessage());
             return null;
         }
     }

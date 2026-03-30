@@ -12,7 +12,7 @@
     <h:body>
         <!-- RECEIPT/VOUCHER STARTS HERE -->
         <p:commandButton id="cmdbPrint" value="#{langout['PRINT']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
-            <p:printer target="IpgrdOuterSalesInvoice" rendered="false"/>
+            <p:printer target="IpgrdOuterSalesInvoice" rendered="true"/>
         </p:commandButton>
         <h:panelGrid id="IpgrdOuterSalesInvoice">
             <h:panelGrid id="IpgrdSalesInvoice" columns="1">

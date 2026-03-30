@@ -147,7 +147,7 @@
                 <p:outputLabel value="#{payBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
             <p:commandButton id="cmdbPrint" value="#{langsys['Print']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
-                <p:printer target="pnlPrint" rendered="false"/>
+                <p:printer target="pnlPrint" rendered="true"/>
             </p:commandButton>
             <p:panel style="border: none;">
                 <h:panelGrid id="pnlPrint" columns="1" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 

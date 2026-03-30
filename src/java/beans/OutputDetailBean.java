@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Pay;
 import entities.PayTrans;
+import entities.Trans;
 import entities.Transaction_approval;
 import entities.Transaction_tax;
 import entities.Transaction_tax_map;
@@ -128,7 +129,7 @@ public class OutputDetailBean implements Serializable {
             }
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(false);
+            HttpSession httpSession = request.getSession(true);
             switch (aLevel) {
                 case "PARENT":
                     httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
@@ -149,8 +150,14 @@ public class OutputDetailBean implements Serializable {
             switch (aLevel) {
                 case "PARENT":
                     try {
-                        aOutputDetail.setTrans(new TransBean().getTrans(new GeneralUserSetting().getCurrentTransactionId()));
+                        long currentTransId = new GeneralUserSetting().getCurrentTransactionId();
+                        System.out.println("DEBUG refreshOutput: currentTransactionId = " + currentTransId);
+                        Trans trans = new TransBean().getTrans(currentTransId);
+                        System.out.println("DEBUG refreshOutput: trans = " + (trans == null ? "NULL" : "NOT NULL, ID=" + trans.getTransactionId()));
+                        aOutputDetail.setTrans(trans);
                     } catch (Exception e) {
+                        System.out.println("DEBUG refreshOutput: Exception getting trans: " + e.getMessage());
+                        e.printStackTrace();
                     }
                     try {
                         aOutputDetail.setPay(new PayBean().getPay(new GeneralUserSetting().getCurrentPayId()));
@@ -415,10 +422,12 @@ public class OutputDetailBean implements Serializable {
             }
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(false);
+            HttpSession httpSession = request.getSession(true);
+            System.out.println("DEBUG refreshOutput: Before setting session - trans = " + (aOutputDetail.getTrans() == null ? "NULL" : "NOT NULL, ID=" + aOutputDetail.getTrans().getTransactionId()));
             switch (aLevel) {
                 case "PARENT":
                     httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
+                    System.out.println("DEBUG refreshOutput: Set OUTPUT_DETAIL_PARENT in session");
                     break;
                 case "CHILD":
                     httpSession.setAttribute("OUTPUT_DETAIL_CHILD", aOutputDetail);
@@ -459,7 +468,7 @@ public class OutputDetailBean implements Serializable {
              */
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(false);
+            HttpSession httpSession = request.getSession(true);
             switch (aLevel) {
                 case "PARENT":
                     httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
@@ -569,7 +578,7 @@ public class OutputDetailBean implements Serializable {
             }
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(false);
+            HttpSession httpSession = request.getSession(true);
             switch (aLevel) {
                 case "PARENT":
                     httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
@@ -682,7 +691,7 @@ public class OutputDetailBean implements Serializable {
             }
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(false);
+            HttpSession httpSession = request.getSession(true);
             switch (aLevel) {
                 case "PARENT":
                     httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
@@ -699,7 +708,7 @@ public class OutputDetailBean implements Serializable {
     public void clearOutputDetail(String aLevel) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-        HttpSession httpSession = request.getSession(false);
+        HttpSession httpSession = request.getSession(true);
         switch (aLevel) {
             case "PARENT":
                 httpSession.setAttribute("OUTPUT_DETAIL_PARENT", new OutputDetail());

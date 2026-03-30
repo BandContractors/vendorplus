@@ -73,7 +73,7 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="100,400,800,1000,2000">
                 <f:facet name="header">
-                    <p:dataTable id="tblSummary" tableStyle="width:auto;" var="sm" value="#{stockBean.stocksSummary}" sortBy="#{1}">
+                    <p:dataTable id="tblSummary" tableStyle="width:auto;" var="sm" value="#{stockBean.stocksSummary}">
                         <p:column headerText="#{langsys['Stock']} #{langsys['Type']}">
                             <h:outputText value="#{sm.stock_type}"/>
                         </p:column>

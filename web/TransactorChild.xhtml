@@ -83,8 +83,8 @@
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <f:ajax listener="#{transactorBean.updateTaxpayer(transactorBean.transactorObj)}" execute="pnlCol1 pnlCol2" render="pnlCol1 pnlCol2" />
-                    </p:commandLink><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
-                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;" required="true">
+                    </p:commandLink></h:outputLabel>
+                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;">
                     </h:inputText>
                     <h:outputLabel  value="#{langsys['Business']} #{langsys['Name']}:" title="#{langsys['Legal']} #{langsys['Business']} #{langsys['Name']}" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
                     <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off" style="width: 203px;" required="true">

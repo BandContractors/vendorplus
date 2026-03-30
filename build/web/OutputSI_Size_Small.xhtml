@@ -11,25 +11,92 @@
         <title>Sales Invoice</title>
         <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <style type="text/css" media="all">
+            /* Force borders on ALL media including print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            /* Screen and Print styles for table - ALWAYS APPLIED */
+            table,
+            #IdtblSalesInvoiceItems,
+            .cls-table-SalesInvoice-very-small {
+                border-collapse: collapse !important;
+                border: 1px solid #000 !important;
+                width: 100% !important;
+            }
+            
+            table th,
+            table td,
+            #IdtblSalesInvoiceItems th,
+            #IdtblSalesInvoiceItems td,
+            .cls-table-SalesInvoice-very-small th,
+            .cls-table-SalesInvoice-very-small td {
+                border: 1px solid #000 !important;
+                padding: 5px !important;
+                text-align: left !important;
+            }
+            
+            table th,
+            #IdtblSalesInvoiceItems th,
+            .cls-table-SalesInvoice-very-small th {
+                background-color: #f0f0f0 !important;
+                font-weight: bold !important;
+            }
+            
+            /* Preserve dotted borders - force explicit print styling */
+            [style*="border-bottom-style: dotted"],
+            [style*="border-bottom-style:dotted"] {
+                border-bottom-width: 2px !important;
+                border-bottom-style: dotted !important;
+                border-bottom-color: #000 !important;
+                padding-bottom: 5px !important;
+            }
+        </style>
+        <style type="text/css" media="print">
+            /* Additional print-specific rules */
+            @page {
+                margin: 0.5cm;
+            }
+            
+            body {
+                margin: 0;
+                padding: 10px;
+            }
+            
+            /* Override any browser default print styles */
+            table,
+            table *,
+            #IdtblSalesInvoiceItems,
+            #IdtblSalesInvoiceItems *,
+            .cls-table-SalesInvoice-very-small,
+            .cls-table-SalesInvoice-very-small * {
+                border: 1px solid #000 !important;
+                box-shadow: none !important;
+            }
+        </style>
     </h:head>
     <h:body>
-        <h:form id="vTransactionForm">
+        <!-- Form removed to avoid nesting inside parent form -->
             <ui:composition>
                 <p:panel style="text-align: center;">
-                    <p:commandButton id="cmdbvPrint" value="#{langout['PRINT']}" icon="ui-icon-print" type="button" rendered="#{menuItemBean.menuItemObj.NO_PRINT_IF_NO_F eq 0 or (menuItemBean.menuItemObj.NO_PRINT_IF_NO_F eq 1 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0)}">
+                    <p:commandButton id="cmdbvPrintReceipt" value="#{langout['PRINT']}" icon="ui-icon-print" type="button" rendered="#{menuItemBean.menuItemObj.NO_PRINT_IF_NO_F eq 0 or (menuItemBean.menuItemObj.NO_PRINT_IF_NO_F eq 1 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0)}">
                         <p:printer target="vTransactionGrid" rendered="false"/>
                     </p:commandButton>
                 </p:panel>
                 <h:panelGrid id="vTransactionGrid">
                     <h:panelGrid id="IpgrdSalesInvoice" columns="1">
 
-                        <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;border-bottom-style: dotted;" columns="1">
+                        <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;" columns="1">
                             <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}"/>
-                            <p:panelGrid style="width: 290px;text-align: center; border-style: none !important;">
+                            <p:panelGrid columns="1" style="width: 290px;text-align: center; border-style: none !important;">
                                 <h:outputLabel id="IolblSalesInvoiceBranch" value="#{companySetting.getBranchCode()} " rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}"/>
                                 <h:outputLabel id="IolblSalesInvoiceStore" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
                             </p:panelGrid>
                         </h:panelGrid>
+                        <hr style="width: 290px; border: 0; border-top: 2px dotted #000; margin: 3px 0;"/>
                         <h:panelGrid style="width: 290px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
                             <p:graphicImage value="#{companySetting.getLogoUrl()}" style="display: block;margin-left: auto;margin-right: auto;"/>
                         </h:panelGrid>
@@ -100,22 +167,26 @@
 
                         <h:panelGrid id="IpgrdSalesInvoiceItems">
                             <h:dataTable id="IdtblSalesInvoiceItems" value="#{generalUserSetting.outputDetailParent.trans_items}" var="ti" 
+                                         border="1"
+                                         frame="border"
+                                         rules="all"
+                                         style="border-collapse: collapse; border: 2px solid #000 !important; width: 100%;"
                                          styleClass="cls-table-SalesInvoice-very-small"   
                                          headerClass="cls-table-header-SalesInvoice" 
                                          rowClasses="cls-table-odd-row-SalesInvoice,cls-table-even-row-SalesInvoice" 
                                          columnClasses="cls-table-col1-SalesInvoice,cls-table-col2-SalesInvoice,cls-table-col3-SalesInvoice"
                                          > 
-                                <h:column>
+                                <h:column style="border: 2px solid #000 !important; padding: 5px;">
                                     <!-- column header -->
-                                    <f:facet name="header">#{langout['ITEMS']}(#{generalUserSetting.outputDetailParent.trans_items.size()})</f:facet>
+                                    <f:facet name="header" style="border: 2px solid #000 !important; padding: 5px; background-color: #f0f0f0 !important;">#{langout['ITEMS']}(#{generalUserSetting.outputDetailParent.trans_items.size()})</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 12px;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false" />
                                     <h:outputLabel style="font-size: 10px;" value=" BN:#{ti.batchno}" escape="false" rendered="#{ti.batchno.length() gt 0 and parameter_listBean.getParameter_listByContextNameMemory('INVOICE','SHOW_BATCH_ON_PRINTOUT').parameter_value eq '1'}"/>
                                     <h:outputLabel style="font-size: 10px;" value=" ED:#{utilityBean.formatDate(ti.itemExpryDate)}" escape="false" rendered="#{ti.itemExpryDate.toString().length() gt 0 and parameter_listBean.getParameter_listByContextNameMemory('INVOICE','SHOW_BATCH_ON_PRINTOUT').parameter_value eq '1'}"/>
                                 </h:column>
-                                <h:column>
+                                <h:column style="border: 2px solid #000 !important; padding: 5px;">
                                     <!-- column header -->
-                                    <f:facet name="header">#{langout['QTY']}(#{utilityBean.formatNumber('###,###,###,###.#############',transItemBean.getTransItemsTotalQty(generalUserSetting.outputDetailParent.trans_items))})</f:facet>
+                                    <f:facet name="header" style="border: 2px solid #000 !important; padding: 5px; background-color: #f0f0f0 !important;">#{langout['QTY']}(#{utilityBean.formatNumber('###,###,###,###.#############',transItemBean.getTransItemsTotalQty(generalUserSetting.outputDetailParent.trans_items))})</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
                                         <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -126,9 +197,9 @@
                                         <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </h:column>
-                                <h:column>
+                                <h:column style="border: 2px solid #000 !important; padding: 5px;">
                                     <!-- column header -->
-                                    <f:facet name="header">#{langout['AMOUNT']}</f:facet>
+                                    <f:facet name="header" style="border: 2px solid #000 !important; padding: 5px; background-color: #f0f0f0 !important;">#{langout['AMOUNT']}</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 12px;float: right;" value="#{ti.amountIncVat}">
                                         <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -137,7 +208,7 @@
                             </h:dataTable>
                         </h:panelGrid>
 
-                        <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted;" columns="2">               
+                        <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;" columns="2">               
                             <h:outputLabel style="font-size: 16px;" value="#{langout['Subtotal']}:" rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}"/>
                             <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceSubTotal" value="#{generalUserSetting.outputDetailParent.trans.subTotal-generalUserSetting.outputDetailParent.trans.totalExciseDutyTaxAmount}" rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}">
                                 <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -175,9 +246,10 @@
                                 <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </h:panelGrid>
+                        <hr style="width: 290px; border: 0; border-top: 2px dotted #000; margin: 3px 0;"/>
 
                         <h:panelGrid id="IpgrdSalesInvoiceVAT">
-                            <h:panelGrid rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="3">
+                            <h:panelGrid rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}" style="width: 290px; margin: 0px;" columns="3">
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Category']}"/>
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Taxable']}"/>
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Tax']}"/>
@@ -191,10 +263,11 @@
                                     </h:outputLabel>
                                 </c:forEach>
                             </h:panelGrid>
+                            <hr style="width: 290px; border: 0; border-top: 2px dotted #000; margin: 3px 0;" rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}"/>
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoicePointsCard">
-                            <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.cardNumber.length()>0}">
+                            <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.cardNumber.length()>0}">
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Loyalty']} #{langout['Card']} #{langout['Number']}:"/>
                                 <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoiceCardNo" value="#{generalUserSetting.outputDetailParent.trans.cardNumber}"/>
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Amount']} #{langout['Spent']}:"/>
@@ -206,6 +279,7 @@
                                     <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                             </h:panelGrid>
+                            <hr style="width: 290px; border: 0; border-top: 2px dotted #000; margin: 3px 0;" rendered="#{generalUserSetting.outputDetailParent.trans.cardNumber.length()>0}"/>
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 290px; margin: 0px;border-bottom-style: none;" columns="2">
@@ -223,17 +297,19 @@
                             <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{langout['Terms']} #{langout['and']} #{langout['Conditions']}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.termsConditions}"/>
                         </h:panelGrid>
-                        <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted;text-align: center;" columns="1" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value.length() gt 0}">
+                        <h:panelGrid style="width: 290px; margin: 0px;text-align: center;" columns="1" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value.length() gt 0}">
                             <h:outputLabel style="font-size: 10px;font-weight: bold;" value="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value}"/>
                         </h:panelGrid>
-                        <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
+                        <hr style="width: 290px; border: 0; border-top: 2px dotted #000; margin: 3px 0;" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value.length() gt 0}"/>
+                        <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
                             <h:outputLabel style="font-size: 10px;" value="#{langout['System']} #{langout['developed']} #{langout['by']} Band Contractors Ltd"/>
                             <h:outputLabel style="font-size: 10px;" value="#{companySetting.getDeveloperEmail()} | #{companySetting.getDeveloperPhone()}"/>
                         </h:panelGrid>
+                        <hr style="width: 290px; border: 0; border-top: 2px dotted #000; margin: 3px 0;" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}"/>
                     </h:panelGrid>
                 </h:panelGrid>
             </ui:composition>
-        </h:form>
+        <!-- Form closing tag removed -->
     </h:body>
 </html>
 
