@@ -46,7 +46,7 @@
 
             <h:panelGrid id="pnlgHeader" styleClass="clsGridMainInput" columns="4">
                 <h:outputLabel  value="#{langsys['From']}:"/>
-                <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
+                <h:inputText styleClass="clsInput" id="itxtFromLocation" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                 <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}:"/>
                 <p:calendar styleClass="clsInput" id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
             </h:panelGrid>

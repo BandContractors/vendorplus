@@ -12,6 +12,22 @@
         <title>Login</title>
         <link href="resources/images/arrow.png" rel="shortcut icon" type="image/png" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <style>
+            @font-face {
+                font-family: 'Montserrat';
+                font-weight: 900;
+                font-style: normal;
+                src: url('faces/resources/fonts/montserrat-latin-900-normal.woff2') format('woff2'),
+                     url('faces/resources/fonts/montserrat-latin-900-normal.woff') format('woff');
+            }
+            @font-face {
+                font-family: 'Montserrat';
+                font-weight: 700;
+                font-style: normal;
+                src: url('faces/resources/fonts/montserrat-latin-700-normal.woff2') format('woff2'),
+                     url('faces/resources/fonts/montserrat-latin-700-normal.woff') format('woff');
+            }
+        </style>
         <script  type="text/javascript">
             function confirmDelete()
             {
@@ -32,16 +48,17 @@
         <f:viewAction action="#{login.refreshLicenseDaysLeft()}"/>
         <f:viewAction action="#{login.refreshWarnings()}"/>
     </f:metadata>
-    <h:body style="background-color: white;">
-        <h:form id="form">  
-            <div class="card">
-                <h:panelGrid id="pnlgLoginHeader" columns="1" style="background-color: #7BC043;width: 100%;color: white; height: 3rem;text-align: center;">
-                    <h:outputLabel styleClass="clsLabelTop" value="VendorPlus" style="font-size: 24px;"/>
+    <h:body style="background-color: white;margin:0;padding:0;min-height:100vh;display:flex;flex-direction:column;">
+        <h:form id="form" style="display:flex;flex-direction:column;flex:1;min-height:100vh;">
+            <div style="background-color:#7BC043;width:100%;text-align:center;padding:18px 0;">
+                <span style="font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;color:white;letter-spacing:1px;">Vendor</span><span style="font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;color:#1a2d6b;letter-spacing:1px;">Plus</span><span style="font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;color:#1a2d6b;">&#x2197;</span>
+            </div>
+            <div class="card" style="flex:1;display:flex;justify-content:center;align-items:center;border:none;box-shadow:none;">
+                <h:panelGrid id="pnlgLoginHeader" columns="1" style="display:none;">
                 </h:panelGrid>
-
-                <h:panelGrid style="width: 100%;margin-top: 5rem;text-align: center;" columns="2">
-                    <h:graphicImage  alt="LOGO" value="resources/images/vendorplus.jpeg" style="max-width: 500px;"/>
-                    <h:panelGrid columns="1"  style="margin-left: 2rem;margin-top: 2px;text-align: center;">
+                <div style="text-align:center;">
+                <h:panelGrid style="margin-top: 2rem;text-align: center;" columns="1">
+                    <h:panelGrid columns="1"  style="margin-top: 2px;text-align: center;">
                         <h:panelGrid columns="1" style="text-align: center;width: 100%">
                             <h:graphicImage id="gimgLogo" alt="LOGO" value="#{companySetting.getLogoUrl()}" />
                             <h:outputLabel style="color: red;font-weight: bold;" value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}"/>
@@ -96,12 +113,13 @@
                         </h:panelGrid>
                     </h:panelGrid>
                 </h:panelGrid>
-                <h:panelGrid id="pnlgMessage"  style="text-align: center;width: 100%">
+                <h:panelGrid id="pnlgMessage"  style="text-align: center;">
                     <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageSuccess" style="color:green" value="#{login.actionMessageSuccess}"/>
                     <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageFailure" style="color: red" value="#{login.actionMessageFailure}"/>
                     <h:outputLabel id="outlNavMsg" value="#{navigationBean.navMsg}" style="color: red"/>
                     <h:messages id="msgsMainMessage" style="color: red"/><br/>
-                </h:panelGrid> 
+                </h:panelGrid>
+                </div>
             </div>
         </h:form>
     </h:body>

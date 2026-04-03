@@ -100,6 +100,27 @@
                 margin: 0;
                 letter-spacing: 0.5px;
             }
+            .pos-logo {
+                display: flex;
+                align-items: center;
+                gap: 0;
+                font-size: 22px;
+                font-weight: 800;
+                letter-spacing: -0.5px;
+                line-height: 1;
+                user-select: none;
+                flex-shrink: 0;
+            }
+            .pos-logo .logo-vendor { color: #ffffff; }
+            .pos-logo .logo-plus  { color: #7BC043; }
+            .pos-logo .logo-arrow {
+                color: #7BC043;
+                font-size: 18px;
+                margin-left: 2px;
+                display: inline-block;
+                transform: rotate(-45deg);
+                font-weight: 900;
+            }
             .pos-topbar .pos-top-actions {
                 display: flex;
                 gap: 10px;
@@ -522,6 +543,24 @@
                 transition: border-color 0.2s;
             }
             .pos-select:focus { border-color: #1F3A5F; outline: none; }
+            /* Force autocomplete to sit inline like a normal select */
+            #TransactionFormSales\:autcTransactionUser,
+            .pos-cashier-ac { display:inline-flex !important; vertical-align:middle; }
+            #TransactionFormSales\:autcTransactionUser .ui-autocomplete,
+            .pos-cashier-ac .ui-autocomplete { display:inline-flex !important; align-items:center; }
+            #TransactionFormSales\:autcTransactionUser .ui-autocomplete-input,
+            .pos-cashier-ac .ui-autocomplete-input {
+                border:1px solid #ccc; border-radius:6px 0 0 6px; padding:6px 8px;
+                font-size:13px; height:34px; box-sizing:border-box;
+                width:130px; transition:border-color 0.2s;
+            }
+            #TransactionFormSales\:autcTransactionUser .ui-autocomplete-input:focus,
+            .pos-cashier-ac .ui-autocomplete-input:focus { border-color:#1F3A5F; outline:none; }
+            #TransactionFormSales\:autcTransactionUser .ui-autocomplete-dropdown,
+            .pos-cashier-ac .ui-autocomplete-dropdown {
+                height:34px; border-radius:0 6px 6px 0; border:1px solid #ccc;
+                border-left:none; background:#fff; padding:0 8px;
+            }
             .pos-input {
                 border: 1px solid #ccc;
                 border-radius: 6px;
@@ -1027,7 +1066,7 @@
                                 </h:selectOneMenu>
                             </div>
                             <h:panelGroup layout="block" styleClass="pos-field-group">
-                                <label>#{langsys['Store']}</label>
+                                <label>#{langsys['Location']}</label>
                                 <h:inputText styleClass="pos-input" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width:100%;"/>
                             </h:panelGroup>
                         </div>
@@ -1187,7 +1226,7 @@
                     </h:panelGrid>
 
                     <!-- ===== CART BOTTOM: Discount + Payment + Totals + Checkout ===== -->
-                    <h:panelGrid id="pgrdTotals" style="width:100%;background:#fff;padding:8px 14px;">
+                    <h:panelGrid id="pgrdTotals" style="width:100%;background:#fff;padding:8px 14px;position:sticky;bottom:0;z-index:100;border-top:2px solid #e0e0e0;box-shadow:0 -2px 8px rgba(0,0,0,0.07);">
                         <div>
                         <!-- === TWO-COLUMN GRID: Left=Payment/Options, Right=Totals === -->
                         <h:panelGroup layout="block" style="display:flex;gap:14px;align-items:flex-start;margin-bottom:10px;">
@@ -1197,7 +1236,7 @@
 
                                 <!-- Payment method + account + staff + Amt Tendered -->
                                 <h:panelGroup id="pgrdPayment" layout="block" style="width:100%;">
-                                    <div class="pos-inline-row">
+                                    <div class="pos-inline-row" style="align-items:center;">
                                         <span class="pos-section-label">Payment</span>
                                         <h:selectOneMenu styleClass="pos-select" id="menuPayMethod" value="#{trans.payMethod}" style="min-width:130px;">
                                             <f:selectItem itemValue="0" itemLabel="-- Select --"/>
@@ -1210,8 +1249,8 @@
                                         <p:autoComplete id="autcTransactionUser" value="#{userDetailBean.selectedUserDetail}"
                                                         completeMethod="#{userDetailBean.getUserDetailObjectListActive}"
                                                         var="ud" itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" itemValue="#{ud}"
-                                                        converter="UserDetailConverter" style="max-width:130px;width:130px;" inputStyle="max-width:100%;" forceSelection="true" queryDelay="0"
-                                                        placeholder="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionUserLabel)}">
+                                                        converter="UserDetailConverter" styleClass="pos-cashier-ac" inputStyle="width:130px;" forceSelection="true" queryDelay="0"
+                                                        placeholder="Cashier / Staff" dropdown="true">
                                             <p:column headerText="#{langsys['User']}/#{langsys['Staff']} #{langsys['Names']}" style="text-align:left">#{ud.firstName} #{ud.secondName} #{ud.thirdName}</p:column>
                                             <p:column headerText="#{langsys['User']} #{langsys['Category']}" style="text-align:left">#{userCategoryBean.getUserCategory(ud.userCategoryId).userCategoryName}</p:column>
                                             <p:ajax event="itemSelect" listener="#{trans.setTransactionUserDetailId(userDetailBean.selectedUserDetail.userDetailId)}"/>
